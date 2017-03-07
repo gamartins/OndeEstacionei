@@ -2,4 +2,8 @@
     <string name="app_name">OndeEstacionei</string>
     <string name="longitude">Longitude: </string>
     <string name="latitude">Latitudade: </string>
+    <string name="current_position">Posição Atual</string>
+    <string name="save">Salvar</string>
+    <string name="preference_file_key">com.example.gabriel.preference_key_file</string>
+    <string name="remove_position">Apagar posição</string>
 </resources>

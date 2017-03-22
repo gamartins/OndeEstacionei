@@ -1,6 +1,10 @@
 package com.example.gabriel.ondeestacionei;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,17 +12,31 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements LocationProvider.LocationCallback, View.OnClickListener {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MainActivity extends FragmentActivity implements
+        LocationProvider.LocationCallback, View.OnClickListener, OnMapReadyCallback {
+
     private LocationProvider locationProvider;
     private TextView currentLatitudeTextView, currentLongitudeTextView;
     private TextView previousLatitudeTextView, previousLongitudeTextView;
     private Button handlePositionButton;
     private StorageProvider storageProvider;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_container);
+        mapFragment.getMapAsync(this);
 
         storageProvider = new StorageProvider(getApplicationContext());
         locationProvider = new LocationProvider(this, this);
@@ -57,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements LocationProvider.
 
     @Override
     public void onClick(View view) {
-        if (storageProvider.isEmpty()){
+        if (storageProvider.isEmpty()) {
             Toast.makeText(this, "Save called", Toast.LENGTH_SHORT).show();
 
             Float latitude = Float.valueOf(currentLatitudeTextView.getText().toString());
@@ -69,6 +87,11 @@ public class MainActivity extends AppCompatActivity implements LocationProvider.
             previousLatitudeTextView.setText(storageProvider.getLatitude().toString());
             previousLongitudeTextView.setText(storageProvider.getLongitude().toString());
 
+            // Criando um marcador com a posição atual
+            LatLng posicaoAtual = new LatLng(storageProvider.getLatitude(), storageProvider.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(posicaoAtual).title("Posição atual"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoAtual, 17));
+
             handlePositionButton.setText(R.string.remove_position);
 
         } else {
@@ -78,6 +101,23 @@ public class MainActivity extends AppCompatActivity implements LocationProvider.
 
             previousLatitudeTextView.setText("");
             previousLongitudeTextView.setText("");
+
+            // Remove os marcadores do mapa.
+            mMap.clear();
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Verificando permissões
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat
+                .checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
 }

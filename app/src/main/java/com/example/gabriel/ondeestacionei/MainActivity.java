@@ -51,6 +51,8 @@ public class MainActivity extends FragmentActivity implements
         if (storageProvider.isEmpty()) {
             handlePositionButton.setText(R.string.save);
         } else {
+            previousLongitudeTextView.setText(storageProvider.getLongitude().toString());
+            previousLatitudeTextView.setText(storageProvider.getLatitude().toString());
             handlePositionButton.setText(R.string.remove_position);
         }
     }

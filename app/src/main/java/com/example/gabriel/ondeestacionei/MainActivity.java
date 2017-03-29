@@ -30,6 +30,7 @@ public class MainActivity extends FragmentActivity implements
     private Button handlePositionButton;
     private StorageProvider storageProvider;
     private GoogleMap mMap;
+    private LatLng posicaoSalva;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +54,11 @@ public class MainActivity extends FragmentActivity implements
         if (storageProvider.isEmpty()) {
             handlePositionButton.setText(R.string.save);
         } else {
+            posicaoSalva = new LatLng(storageProvider.getLatitude(), storageProvider.getLongitude());
+
             previousLongitudeTextView.setText(storageProvider.getLongitude().toString());
             previousLatitudeTextView.setText(storageProvider.getLatitude().toString());
+
             handlePositionButton.setText(R.string.remove_position);
         }
     }
@@ -97,9 +101,9 @@ public class MainActivity extends FragmentActivity implements
             previousLongitudeTextView.setText(storageProvider.getLongitude().toString());
 
             // Criando um marcador com a posição atual
-            LatLng posicaoAtual = new LatLng(storageProvider.getLatitude(), storageProvider.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(posicaoAtual).title("Posição atual"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoAtual, 17));
+            posicaoSalva = new LatLng(storageProvider.getLatitude(), storageProvider.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(posicaoSalva).title("Posição salva"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, 17));
 
             handlePositionButton.setText(R.string.remove_position);
 
@@ -119,6 +123,10 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (posicaoSalva != null) {
+            mMap.addMarker(new MarkerOptions().position(posicaoSalva).title("Posição salva"));
+        }
 
         // Verificando permissões
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

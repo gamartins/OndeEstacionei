@@ -12,11 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends FragmentActivity implements
@@ -73,6 +75,11 @@ public class MainActivity extends FragmentActivity implements
     public void handleNewLocation(Location location) {
         currentLongitudeTextView.setText(String.valueOf(location.getLongitude()));
         currentLatitudeTextView.setText(String.valueOf(location.getLatitude()));
+
+        if (mMap != null) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        }
     }
 
     @Override

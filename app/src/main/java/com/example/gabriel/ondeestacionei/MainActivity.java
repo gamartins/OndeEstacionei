@@ -3,23 +3,23 @@ package com.example.gabriel.ondeestacionei;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import static com.example.gabriel.ondeestacionei.LocationProvider.REQUEST_PERMISSION_ACCESS_FINE_LOCATION;
 
 public class MainActivity extends FragmentActivity implements
         LocationProvider.LocationCallback, View.OnClickListener, OnMapReadyCallback {
@@ -31,18 +31,28 @@ public class MainActivity extends FragmentActivity implements
     private StorageProvider storageProvider;
     private GoogleMap mMap;
     private LatLng posicaoSalva;
+    private SupportMapFragment mapFragment;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map_container);
-        mapFragment.getMapAsync(this);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_container);
+
+        // Requisitando as permissões de localização
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSION_ACCESS_FINE_LOCATION);
+        } else {
+            locationProvider = new LocationProvider(this, this);
+            mapFragment.getMapAsync(this);
+        }
 
         storageProvider = new StorageProvider(getApplicationContext());
-        locationProvider = new LocationProvider(this, this);
 
         currentLatitudeTextView = (TextView) findViewById(R.id.latitudeTextView);
         currentLongitudeTextView = (TextView) findViewById(R.id.longitudadeTextView);
@@ -65,13 +75,13 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onStart() {
-        locationProvider.connect();
+        if (locationProvider !=null) locationProvider.connect();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        locationProvider.disconnect();
+        if (locationProvider !=null) locationProvider.disconnect();
         super.onStop();
     }
 
@@ -79,11 +89,15 @@ public class MainActivity extends FragmentActivity implements
     public void handleNewLocation(Location location) {
         currentLongitudeTextView.setText(String.valueOf(location.getLongitude()));
         currentLatitudeTextView.setText(String.valueOf(location.getLatitude()));
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        if (mMap != null) {
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (mMap != null && this.location == null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        } else {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
+
+        this.location = location;
     }
 
     @Override
@@ -135,6 +149,22 @@ public class MainActivity extends FragmentActivity implements
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
         mMap.setMyLocationEnabled(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_PERMISSION_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    locationProvider = new LocationProvider(this, this);
+                    mapFragment.getMapAsync(this);
+                }
+            }
+
+        }
     }
 }

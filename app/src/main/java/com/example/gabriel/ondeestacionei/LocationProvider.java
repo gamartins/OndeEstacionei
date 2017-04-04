@@ -1,7 +1,6 @@
 package com.example.gabriel.ondeestacionei;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -68,26 +66,18 @@ public class LocationProvider implements
         }
     }
 
-    private void getPermission(){
-        ActivityCompat.requestPermissions((Activity) context,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_PERMISSION_ACCESS_FINE_LOCATION);
-    }
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "Location services connected");
 
         // Checking for permission
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            getPermission();
+                == PackageManager.PERMISSION_GRANTED) {
+            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+
+            locationCallback.handleNewLocation(location);
         }
-
-        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-
-        locationCallback.handleNewLocation(location);
     }
 
     @Override

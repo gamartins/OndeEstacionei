@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import static com.example.gabriel.ondeestacionei.LocationProvider.REQUEST_PERMIS
 
 public class MainActivity extends FragmentActivity implements
         LocationProvider.LocationCallback, View.OnClickListener, OnMapReadyCallback {
+
+    private static float ZOOM_LEVEL = 19;
 
     private LocationProvider locationProvider;
     private TextView currentLatitudeTextView, currentLongitudeTextView;
@@ -92,7 +95,7 @@ public class MainActivity extends FragmentActivity implements
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         if (mMap != null && this.location == null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
         } else {
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
@@ -117,7 +120,7 @@ public class MainActivity extends FragmentActivity implements
             // Criando um marcador com a posição atual
             posicaoSalva = new LatLng(storageProvider.getLatitude(), storageProvider.getLongitude());
             mMap.addMarker(new MarkerOptions().position(posicaoSalva).title("Posição salva"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, 17));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, ZOOM_LEVEL));
 
             handlePositionButton.setText(R.string.remove_position);
 
@@ -137,6 +140,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, ZOOM_LEVEL));
 
         if (posicaoSalva != null) {
             mMap.addMarker(new MarkerOptions().position(posicaoSalva).title("Posição salva"));

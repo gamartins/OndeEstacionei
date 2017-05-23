@@ -140,9 +140,10 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, ZOOM_LEVEL));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, ZOOM_LEVEL));
 
         if (posicaoSalva != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicaoSalva, ZOOM_LEVEL));
             mMap.addMarker(new MarkerOptions().position(posicaoSalva).title("Posição salva"));
         }
 

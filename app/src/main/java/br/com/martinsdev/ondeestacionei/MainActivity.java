@@ -1,4 +1,4 @@
-package com.example.gabriel.ondeestacionei;
+package br.com.martinsdev.ondeestacionei;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,7 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static com.example.gabriel.ondeestacionei.LocationProvider.REQUEST_PERMISSION_ACCESS_FINE_LOCATION;
+import static br.com.martinsdev.ondeestacionei.LocationProvider.REQUEST_PERMISSION_ACCESS_FINE_LOCATION;
 
 public class MainActivity extends FragmentActivity implements
         LocationProvider.LocationCallback, View.OnClickListener, OnMapReadyCallback {

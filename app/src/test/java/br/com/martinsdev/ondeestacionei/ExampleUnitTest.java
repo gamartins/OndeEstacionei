@@ -1,4 +1,4 @@
-package com.example.gabriel.ondeestacionei;
+package br.com.martinsdev.ondeestacionei;
 
 import org.junit.Test;
 

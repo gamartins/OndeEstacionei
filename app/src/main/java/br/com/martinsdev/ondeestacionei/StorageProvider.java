@@ -1,4 +1,4 @@
-package com.example.gabriel.ondeestacionei;
+package br.com.martinsdev.ondeestacionei;
 
 import android.content.Context;
 import android.content.SharedPreferences;
